@@ -1,37 +1,65 @@
-# Sortieralgorithmus für Zylinder
+# 📦 Sortieralgorithmus für Zylinder
 
-Ein Projekt zur Implementierung eines Sortieralgorithmus, der verschiedene Zylinder basierend auf Symbolen erkennt, sortiert und an die korrekten Positionen transportiert.
-
-## Projektübersicht
-
-Dieses Projekt beinhaltet:
-- **Sortieralgorithmus:** Realisiert mithilfe von Teach-Pendant-Code für Industrieroboter.
-- **Ziel:** Zylinder basierend auf erkannten Symbolen wie Dreieck, Quadrat oder Kreis korrekt sortieren.
-- **Positionserkennung:** Steuerung des Greifers zu markierten Positionen zur Identifikation und Ablage.
-- **Visualisierung:** Funktionspunkte und ein Aktivitätsdiagramm, das den Ablauf veranschaulicht.
+Ein Projekt zur Implementierung eines Sortieralgorithmus für Industrieroboter. Ziel ist die Erkennung und Sortierung von Zylindern anhand von Symbolen wie Dreieck, Quadrat und Kreis. 
 
 ---
 
-## Funktionsweise
+## 🌟 **Projektübersicht**
 
-1. **Initialisierung:**
-   - Der Algorithmus setzt die Anfangsparameter wie `User-Tool` und `User-Frame` fest.
-   - Alle Register werden auf 0 initialisiert.
-
-2. **Pick Position:**
-   - Basierend auf dem aktuellen Zustand des Registers springt das Programm mithilfe einer `Select`- und `Jump-Label`-Anweisung zu den jeweiligen Positionen.
-
-3. **Symbolerkennung:**
-   - Nach der Platzierung des Zylinders wird das Unterprogramm `MESSEN` aufgerufen, das das Symbol identifiziert und das Ergebnis im Register speichert.
-
-4. **Sortierung:**
-   - Je nach erkanntem Symbol (Dreieck, Quadrat, Kreis oder fehlerhaft) wird der Zylinder in die entsprechende Zielposition gelegt.
-
-5. **Schleifenabschluss:**
-   - Die Schleife endet, wenn alle Zylinder sortiert wurden.
+Dieses Projekt zeigt die Fähigkeit, komplexe Logiken mithilfe eines Teach-Pendants zu realisieren. Es umfasst:
+- **Symbolbasierte Sortierung** von Zylindern.
+- **Teach-Pendant Code**: Implementierung eines Hauptprogramms und eines Unterprogramms.
+- **Hardware**: Steuerung des Roboters über ein Ramps 1.4 Shield Board.
+- **Ablaufvisualisierung**: Funktionspunkte und Aktivitätsdiagramme, um die Sortierlogik verständlich darzustellen.
 
 ---
 
+## ⚙️ **Funktionsweise des Sortieralgorithmus**
+
+### **1. Initialisierung**
+- Der Algorithmus setzt wichtige Parameter:
+  - `UTOOL_NUM = 1`: Das Werkzeug des Roboters wird definiert.
+  - `UFRAME_NUM = 2`: Der Referenzrahmen wird festgelegt.
+- **Alle Register (R[1] bis R[5]) werden auf 0 gesetzt**, um eine neutrale Ausgangslage zu schaffen.
+
+---
+
+### **2. Abholung der Zylinder (Pick Position)**
+- Über eine `SELECT`-Anweisung wird der aktuelle Zustand eines Registers überprüft.
+- Anhand des Zustands wird zu einer markierten Stelle (`LBL[x]`) im Programm gesprungen:
+  - **LBL[1] - Position P[2]**
+  - **LBL[2] - Position P[4]**
+  - **LBL[3] - Position P[6]**
+  - **LBL[4] - Position P[8]**
+  - **LBL[5] - Position P[10]**
+  - **LBL[6] - Position P[12]**
+- Der Greifer wird zu der jeweiligen Position geführt, der Zylinder wird gegriffen und zur Ausgangsposition zurückgebracht.
+
+---
+
+### **3. Symbolerkennung**
+- Nach dem Platzieren wird das **Unterprogramm `MESSEN`** aufgerufen.
+- Das Symbol des Zylinders wird mithilfe eines Vision-Systems identifiziert und das Ergebnis im Register `R[20]` gespeichert:
+  - **R[20] = 0**: Fehlerhaftes Symbol
+  - **R[20] = 1**: Dreieck
+  - **R[20] = 2**: Quadrat
+  - **R[20] = 3**: Kreis
+
+---
+
+### **4. Platzierung der Zylinder**
+Basierend auf dem Wert in `R[20]` wird der Zylinder in den korrekten Zielbereich gelegt:
+- **Fehlerhafte Zylinder**: Ablage in einem speziellen Bereich (z. B. Position P[14]).
+- **Dreieck**: Ablage an den nächsten freien Feldern für Dreiecke.
+- **Quadrat**: Ablage an den nächsten freien Feldern für Quadrate.
+- **Kreis**: Ablage an den nächsten freien Feldern für Kreise.
+
+---
+
+### **5. Schleifenabschluss**
+- Die Schleife endet, wenn alle Zylinder sortiert und korrekt platziert wurden.
+
+---
 ## Diagramme und Bilder
 
 ### Teach-Pendant Code Beispiel
@@ -47,31 +75,22 @@ Das Aktivitätsdiagramm visualisiert die Logik des Sortierprozesses.
 
 ---
 
-## Code-Beschreibung
+## 🖥️ **Code-Struktur**
 
-### Hauptprogramm: `Sortierung_Main`
+### **Hauptprogramm: `Sortierung_Main`**
+Das Hauptprogramm steuert den Ablauf der Sortierung:
 ```plaintext
-1. Initialisierung:
-   - UTOOL_NUM = 1
-   - UFRAME_NUM = 2
-2. Register nullen:
-   - R[1] = 0
-   - R[2] = 0
-3. Pick Position:
-   - R[1] = 0 bis 5
-   - SELECT-Anweisungen
-4. Symbolerkennung:
-   - Aufruf des Unterprogramms MESSEN
-5. Fehlerbehandlung:
-   - Ablage fehlerhafter Teile.
-6. Platzierung nach Symbol:
-   - Zuweisung für Dreieck, Quadrat und Kreis.
+1. UTOOL_NUM = 1
+2. UFRAME_NUM = 2
+3. R[1] bis R[5] = 0 (Initialisierung)
+4. SELECT R[1] → Springt zu den entsprechenden Labels (LBL[1] bis LBL[6]).
+5. Aufruf des Unterprogramms `MESSEN`.
+6. Ablage basierend auf dem Symbolwert in R[20].
+```
 
-### Unterprogramm: `Messen`
-1. Positionierung:
-   - Bewegung zur Messposition.
-2. Symbolerkennung:
-   - Aktivierung des Vision-Systems.
-3. Ergebnis:
-   - Speicherung des Symbols im Register.
-
+### Unterprogramm: `Messen`**
+```plaintext
+1. Bewegung zur Messposition.
+2. Aktivierung des Vision-Systems.
+3. Ergebnis in Register R[20] speichern.
+```
